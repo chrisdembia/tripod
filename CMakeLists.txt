@@ -1,4 +1,4 @@
-project(Tripod)
+project(Tripod CXX)
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -11,8 +11,11 @@ set(CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Release"
       else will be ignored." FORCE )
 
 include_directories(${OPENSIMSIMBODY_INCLUDE_DIRS})
+link_directories(${OPENSIM_LIB_DIR})
 
 add_executable(model model.cpp)
+message("DEBUG" ${OPENSIMSIMBODY_LIBRARIES})
+message("DEBUG ${OPENSIMSIMBODY_LIBRARIES}")
 target_link_libraries(model ${OPENSIMSIMBODY_LIBRARIES})
 
 #add_executable(synthesize synthesize.cpp)

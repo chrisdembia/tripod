@@ -40,6 +40,7 @@
 # To use the headers and libraries from OpenSim in your own targets:
 #
 #   include_directories(${OPENSIMSIMBODY_INCLUDE_DIRS})
+#   link_directories(${OPENSIM_LIB_DIR})
 #   add_executable(myAwesomeClientToOpenSim ${CLIENT_SOURCE} ${CLIENT_HEADERS})
 #   target_link_libraries(myAwesomeClientToOpenSim ${OPENSIMSIMBODY_LIBRARIES})
 #
@@ -204,49 +205,50 @@ set(OPENSIM_BIN_DIR ${OPENSIM_ROOT_DIR}/bin CACHE PATH
 set(OPENSIM_LIBRARIES_DOC "Suitable for target_link_libraries(). Contains only
     the libraries with 'osim' in their name.
     Modifying this variable will have no effect.")
-set(OPENSIMSIMBODY_LIBRARIES_DOC "Suitable for target_link_libraries().
-    Contains libraries with either 'osim' or 'SimTK' in their name.
-    Modifying this variable will have no effect.")
 
+## OpenSim libraries.
 # This variables are for our purposes only; its name comes from convention:
 set(OPENSIM_LIBRARY)
-
 set(OPENSIM_LIBRARY_LIST
     osimCommon osimSimulation osimAnalyses osimActuators osimTools)
-set(OPENSIMSIMBODY_LIBRARY_LIST SimTKcommon SimTKmath SimTKsimbody)
 
 foreach(LIB_NAME IN LISTS OPENSIM_LIBRARY_LIST)
     find_library(FOUND_LIB NAMES ${LIB_NAME}
         PATHS ${OPENSIM_LIB_DIR}
         NO_DEFAULT_PATH)
-    if(FOUND_LIB)
-        list(APPEND OPENSIM_LIBRARY optimized ${FOUND_LIB})
+    if(NOT "${FOUND_LIB}" MATCHES "NOTFOUND")
+        list(APPEND OPENSIM_LIBRARY optimized ${LIB_NAME})
     endif()
 
     find_library(FOUND_LIB NAMES ${LIB_NAME}_d
         PATHS ${OPENSIM_LIB_DIR}
         NO_DEFAULT_PATH)
-    if(FOUND_LIB)
-        list(APPEND OPENSIM_LIBRARY debug ${FOUND_LIB}_d)
+    if(NOT "${FOUND_LIB}" MATCHES "NOTFOUND")
+        list(APPEND OPENSIM_LIBRARY debug ${LIB_NAME}_d)
     endif()
 endforeach()
 
+## Simbody libraries.
 # Start off this list of libraries with the OpenSim libraries.
+set(OPENSIMSIMBODY_LIBRARIES_DOC "Suitable for target_link_libraries().
+    Contains libraries with either 'osim' or 'SimTK' in their name.
+    Modifying this variable will have no effect.")
 set(OPENSIMSIMBODY_LIBRARY ${OPENSIM_LIBRARY})
+set(OPENSIMSIMBODY_LIBRARY_LIST SimTKcommon SimTKmath SimTKsimbody)
 
 foreach(LIB_NAME IN LISTS OPENSIMSIMBODY_LIBRARY_LIST)
     find_library(FOUND_LIB NAMES ${LIB_NAME}
         PATHS ${OPENSIM_LIB_DIR}
         NO_DEFAULT_PATH)
-    if(FOUND_LIB)
-        list(APPEND OPENSIMSIMBODY_LIBRARY optimized ${FOUND_LIB})
+    if(NOT "${FOUND_LIB}" MATCHES "NOTFOUND")
+        list(APPEND OPENSIMSIMBODY_LIBRARY optimized ${LIB_NAME})
     endif()
 
     find_library(FOUND_LIB NAMES ${LIB_NAME}_d
         PATHS ${OPENSIM_LIB_DIR}
         NO_DEFAULT_PATH)
-    if(FOUND_LIB)
-        list(APPEND OPENSIMSIMBODY_LIBRARY debug ${FOUND_LIB}_d)
+    if(NOT "${FOUND_LIB}" MATCHES "NOTFOUND")
+        list(APPEND OPENSIMSIMBODY_LIBRARY debug ${LIB_NAME}_d)
     endif()
 endforeach()
 unset(FOUND_LIB CACHE)
@@ -280,6 +282,12 @@ if(OPENSIM_FOUND)
         CACHE STRING ${OPENSIMSIMBODY_LIBRARIES_DOC} FORCE)
 else()
 endif()
+
+# To avoid excess complication, remove these:
+unset(OPENSIM_INCLUDE_DIR CACHE)
+unset(OPENSIM_LIBRARY CACHE)
+unset(OPENSIMSIMBODY_INCLUDE_DIR CACHE)
+unset(OPENSIMSIMBODY_LIBRARY CACHE)
 
 mark_as_advanced(
     OPENSIM_ROOT_DIR
