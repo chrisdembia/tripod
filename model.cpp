@@ -279,6 +279,8 @@ int main(int argc, char * argv[])
     torso->updDisplayer()->updGeometrySet().adoptAndAppend(torsoDisplay);
     torso->updDisplayer()->setShowAxes(true);
 
+    // Limbs.
+    // ``````
     addCylinderDisplayGeometry(hindThigh, thighDiameter, thighLength);
     addCylinderDisplayGeometry(hindShank, shankDiameter, shankLength);
     addCylinderDisplayGeometry(frontLeftThigh, thighDiameter, thighLength);
