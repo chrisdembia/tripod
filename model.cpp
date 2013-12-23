@@ -51,6 +51,15 @@ void addShankCoordinateLimitForce(Model & model, const std::string & coord)
 	model.addForce(force);
 };
 
+void addCoordinateActuator(Model & model, const std::string & coord)
+{
+    OpenSim::CoordinateActuator * act = new OpenSim::CoordinateActuator(coord);
+    act->setName(coord + "_actuator");
+    act->setMinControl(-1000.0);
+    act->setMaxControl(1000.0);
+    model.addForce(act);
+};
+
 int main(int argc, char * argv[])
 {
     // Preliminaries.
@@ -293,9 +302,14 @@ int main(int argc, char * argv[])
     // --------
     // So the tripod does not go through the ground.
 
+    addCoordinateActuator(tripod, "hind_thigh_flexion");
+    addCoordinateActuator(tripod, "front_left_thigh_flexion");
+    addCoordinateActuator(tripod, "front_right_thigh_flexion");
+    addCoordinateActuator(tripod, "hind_knee_extension");
+    addCoordinateActuator(tripod, "front_left_knee_extension");
+    addCoordinateActuator(tripod, "front_right_knee_extension");
 
-    // Add actuators.
-    // --------------
+    // Print the model.
     tripod.print("tripod.osim");
 
     return EXIT_SUCCESS;
