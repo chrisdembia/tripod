@@ -297,17 +297,16 @@ int main(int argc, char * argv[])
 
     // Actuators.
     // ----------
-
-    // Contact.
-    // --------
-    // So the tripod does not go through the ground.
-
     addCoordinateActuator(tripod, "hind_thigh_flexion");
     addCoordinateActuator(tripod, "front_left_thigh_flexion");
     addCoordinateActuator(tripod, "front_right_thigh_flexion");
     addCoordinateActuator(tripod, "hind_knee_extension");
     addCoordinateActuator(tripod, "front_left_knee_extension");
     addCoordinateActuator(tripod, "front_right_knee_extension");
+
+    // Contact.
+    // --------
+    // So the tripod does not go through the ground.
 
     // Print the model.
     tripod.print("tripod.osim");
