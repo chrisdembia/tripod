@@ -60,6 +60,15 @@ void addCoordinateActuator(Model & model, const std::string & coord)
     model.addForce(act);
 };
 
+void addContactGeometry(Model & model, double xmeas, Body * body,
+        const std::string name)
+{
+    OpenSim::ContactSphere * contact = new OpenSim::ContactSphere(
+            0.05, Vec3(xmeas, 0, 0), *body, name);
+    contact->setName(name);
+    model.addContactGeometry(contact);
+}
+
 int main(int argc, char * argv[])
 {
     // Preliminaries.
@@ -309,6 +318,18 @@ int main(int argc, char * argv[])
     // Contact.
     // --------
     // So the tripod does not go through the ground.
+    OpenSim::ContactHalfSpace * groundContact = new OpenSim::ContactHalfSpace(
+            Vec3(0), Vec3(0.0, 0.0, -0.5 * Pi), ground);
+    groundContact->setName("ground_contact");
+    tripod.addContactGeometry(groundContact);
+
+    // Limbs.
+    // ``````
+    addContactGeometry(tripod, shankLength, hindShank, "hind_foot_contact");
+    addContactGeometry(tripod, shankLength, frontLeftShank,
+            "front_left_foot_contact");
+    addContactGeometry(tripod, shankLength, frontRightShank,
+            "front_right_foot_contact");
 
     // Print the model.
     tripod.print("tripod.osim");
