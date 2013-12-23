@@ -1,13 +1,14 @@
 
 #include <OpenSim/OpenSim.h>
 
+using SimTK::Inertia;
+using SimTK::Pi;
 using SimTK::Vec3;
 
 using OpenSim::Body;
 using OpenSim::CoordinateSet;
 using OpenSim::DisplayGeometry;
-using SimTK::Inertia;
-using SimTK::Pi;
+using OpenSim::Model;
 using OpenSim::PinJoint;
 
 /**
@@ -20,7 +21,7 @@ using OpenSim::PinJoint;
  * +z: out of the screen.
  * */
 
-/** Helper function. **/
+/** Helper functions. **/
 void addCylinderDisplayGeometry(Body * body,
         const double & diam, const double & length)
 {
@@ -34,13 +35,27 @@ void addCylinderDisplayGeometry(Body * body,
     geom->setScaleFactors(Vec3(0.5 * diam, length, 0.5 * diam));
     body->updDisplayer()->setShowAxes(true);
     body->updDisplayer()->updGeometrySet().adoptAndAppend(geom);
-}
+};
+
+void addThighCoordinateLimitForce(Model & model, const std::string & coord)
+{
+    OpenSim::CoordinateLimitForce * force = new OpenSim::CoordinateLimitForce(
+                coord, 90, 1.0E2, -90, 1.0E2, 1.0E1, 2.0, false);
+	model.addForce(force);
+};
+
+void addShankCoordinateLimitForce(Model & model, const std::string & coord)
+{
+    OpenSim::CoordinateLimitForce * force = new OpenSim::CoordinateLimitForce(
+                coord, 10, 1.0E2, -160, 1.0E2, 1.0E1, 2.0, false);
+	model.addForce(force);
+};
 
 int main(int argc, char * argv[])
 {
     // Preliminaries.
     // --------------
-    OpenSim::Model tripod;
+    Model tripod;
     tripod.setName("tripod");
 
     // Properties.
@@ -180,7 +195,7 @@ int main(int argc, char * argv[])
 
     CoordinateSet & torsoFrontLeftThighCS =
         torsoFrontLeftThigh->upd_CoordinateSet();
-    torsoFrontLeftThighCS[0].setName("hind_thigh_flexion");
+    torsoFrontLeftThighCS[0].setName("front_left_thigh_flexion");
     double torsoFrontLeftThighCS0range[2] = {-0.5 * Pi, 0.5 * Pi};
     torsoFrontLeftThighCS[0].setRange(torsoFrontLeftThighCS0range);
 
@@ -213,7 +228,7 @@ int main(int argc, char * argv[])
 
     CoordinateSet & torsoFrontRightThighCS =
         torsoFrontRightThigh->upd_CoordinateSet();
-    torsoFrontRightThighCS[0].setName("hind_thigh_flexion");
+    torsoFrontRightThighCS[0].setName("front_right_thigh_flexion");
     double torsoFrontRightThighCS0range[2] = {-0.5 * Pi, 0.5 * Pi};
     torsoFrontRightThighCS[0].setRange(torsoFrontRightThighCS0range);
 
@@ -261,6 +276,18 @@ int main(int argc, char * argv[])
     addCylinderDisplayGeometry(frontLeftShank, shankDiameter, shankLength);
     addCylinderDisplayGeometry(frontRightThigh, thighDiameter, thighLength);
     addCylinderDisplayGeometry(frontRightShank, shankDiameter, shankLength);
+
+    // Enforce joint limits on the legs.
+    // ---------------------------------
+    addThighCoordinateLimitForce(tripod, "hind_thigh_flexion");
+    addThighCoordinateLimitForce(tripod, "front_left_thigh_flexion");
+    addThighCoordinateLimitForce(tripod, "front_right_thigh_flexion");
+    addShankCoordinateLimitForce(tripod, "hind_knee_extension");
+    addShankCoordinateLimitForce(tripod, "front_left_knee_extension");
+    addShankCoordinateLimitForce(tripod, "front_right_knee_extension");
+
+    // Actuators.
+    // ----------
 
     // Contact.
     // --------

@@ -14,8 +14,6 @@ include_directories(${OPENSIMSIMBODY_INCLUDE_DIRS})
 link_directories(${OPENSIM_LIB_DIR})
 
 add_executable(model model.cpp)
-message("DEBUG" ${OPENSIMSIMBODY_LIBRARIES})
-message("DEBUG ${OPENSIMSIMBODY_LIBRARIES}")
 target_link_libraries(model ${OPENSIMSIMBODY_LIBRARIES})
 
 #add_executable(synthesize synthesize.cpp)
